@@ -241,3 +241,4 @@ if __name__ == '__main__':
     golf = UserStudyTkinter()
     golf.gui_set()
     tkinter.mainloop()
+    golf.file.close()
