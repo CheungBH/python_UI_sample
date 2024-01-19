@@ -9,7 +9,7 @@ folder_path = "UI_images/cat_dog"  # Specify the folder path directly
 classes_list = ["cat", "dog"]  # Add your desired classes here
 target_file = "classification_results.txt"  # Specify the target file name directly
 
-class ImageClassifierGUI:
+class ImageLabellerGUI:
     def __init__(self, root):
         self.root = root
         self.image_files = []
@@ -194,5 +194,5 @@ class ImageClassifierGUI:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    gui = ImageClassifierGUI(root)
+    gui = ImageLabellerGUI(root)
     root.mainloop()
