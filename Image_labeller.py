@@ -19,6 +19,7 @@ class ImageClassifierGUI:
 
         self.create_widgets()
         self.load_images()
+        self.read_results()
 
     def create_widgets(self):
         self.root.title("Image Classifier")
@@ -80,6 +81,7 @@ class ImageClassifierGUI:
             self.class_buttons.append(button)
 
         self.display_image()
+        self.update_button_colors()
 
     def display_image(self):
         image_path = os.path.join(folder_path, self.image_files[self.current_index])
@@ -103,6 +105,23 @@ class ImageClassifierGUI:
 
         self.update_button_colors()
         self.update_counter_label()
+
+    def read_results(self):
+        if os.path.exists(target_file):
+            with open(target_file, "r") as file:
+                lines = file.readlines()
+                for line in lines:
+                    image_file, class_label = line.strip().split(":")
+                    self.classification_results[image_file.strip()] = class_label.strip()
+                self.update_text_view()
+
+    def update_text_view(self):
+        current_image = self.image_files[self.current_index]
+        if current_image in self.classification_results:
+            class_label = self.classification_results[current_image]
+            self.selected_image_label.config(text=class_label)
+        else:
+            self.selected_image_label.config(text="")
 
     def label_image(self, class_name):
         current_image = self.image_files[self.current_index]
