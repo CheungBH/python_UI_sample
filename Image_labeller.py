@@ -2,9 +2,10 @@ import os
 import cv2
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import filedialog
 from PIL import Image, ImageTk
 
-folder_path = "UI_images/cat_dog"
+folder_path = "UI_images/cat_dog"  # Specify the folder path directly
 
 class ImageClassifierGUI:
     def __init__(self, root):
@@ -31,21 +32,27 @@ class ImageClassifierGUI:
         self.next_button = tk.Button(self.buttons_frame, text="Next", command=self.next_image)
         self.next_button.grid(row=0, column=0, padx=5)
 
+        # Create back button
+        self.back_button = tk.Button(self.buttons_frame, text="Back", command=self.previous_image)
+        self.back_button.grid(row=0, column=1, padx=5)
+        self.back_button.config(state=tk.DISABLED)
+
     def load_images(self):
-        # folder_path = filedialog.askdirectory()
-        if folder_path:
-            self.image_files = [file for file in os.listdir(folder_path) if file.lower().endswith(('.png', '.jpg', '.jpeg'))]
-            if len(self.image_files) == 0:
-                messagebox.showerror("Error", "No image files found in the selected folder.")
-                return
-            self.classes = ["cat", "dog"]  # Add your desired classes here
+        folder_path = "UI_images/cat_dog"  # Specify the folder path directly
+        self.image_files = [file for file in os.listdir(folder_path) if file.lower().endswith(('.png', '.jpg', '.jpeg'))]
+        if len(self.image_files) == 0:
+            messagebox.showerror("Error", "No image files found in the selected folder.")
+            return
+        self.classes = ["cat", "dog"]  # Add your desired classes here
 
-            # Create class buttons
-            for i, class_name in enumerate(self.classes):
-                button = tk.Button(self.buttons_frame, text=class_name, command=lambda x=class_name: self.label_image(x))
-                button.grid(row=0, column=i+1, padx=5)
+        # Create class buttons
+        self.class_buttons = []
+        for i, class_name in enumerate(self.classes):
+            button = tk.Button(self.buttons_frame, text=class_name, command=lambda x=class_name: self.label_image(x))
+            button.grid(row=0, column=i+2, padx=5)
+            self.class_buttons.append(button)
 
-            self.display_image()
+        self.display_image()
 
     def display_image(self):
         image_path = os.path.join(folder_path, self.image_files[self.current_index])
@@ -69,6 +76,9 @@ class ImageClassifierGUI:
         self.image_label = tk.Label(self.image_frame, image=self.photo)
         self.image_label.pack()
 
+        # Update button colors
+        self.update_button_colors()
+
     def label_image(self, class_name):
         self.classification_results[self.image_files[self.current_index]] = class_name
         self.next_image()
@@ -78,10 +88,29 @@ class ImageClassifierGUI:
         if self.current_index < len(self.image_files):
             self.image_label.destroy()
             self.display_image()
+            self.back_button.config(state=tk.NORMAL)
         else:
             self.save_results()
             messagebox.showinfo("Info", "Image labeling complete.")
             self.root.destroy()
+
+    def previous_image(self):
+        self.current_index -= 1
+        self.image_label.destroy()
+        self.display_image()
+        if self.current_index == 0:
+            self.back_button.config(state=tk.DISABLED)
+
+    def update_button_colors(self):
+        for button in self.class_buttons:
+            button.configure(bg="SystemButtonFace")  # Reset button color
+
+        current_image = self.image_files[self.current_index]
+        if current_image in self.classification_results:
+            class_name = self.classification_results[current_image]
+            for button in self.class_buttons:
+                if button["text"] == class_name:
+                    button.configure(bg="green")
 
     def save_results(self):
         results_file = open('classification_results.txt', 'w')
