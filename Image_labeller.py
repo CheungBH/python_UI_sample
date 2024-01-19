@@ -54,6 +54,18 @@ class ImageClassifierGUI:
         self.buttons_frame_bottom = tk.Frame(self.root)
         self.buttons_frame_bottom.pack(pady=10)
 
+        # Create the counter label
+        self.counter_label = tk.Label(self.buttons_frame_top, text="")
+        self.counter_label.pack(side=tk.LEFT, padx=5)
+
+        # Update the counter label
+        self.update_counter_label()
+
+    def update_counter_label(self):
+        total_images = len(self.image_files)
+        current_image_number = self.current_index + 1
+        self.counter_label.config(text=f"{current_image_number}/{total_images}")
+
     def load_images(self):
         self.image_files = [file for file in os.listdir(folder_path) if file.lower().endswith(('.png', '.jpg', '.jpeg'))]
         if len(self.image_files) == 0:
@@ -90,6 +102,7 @@ class ImageClassifierGUI:
         self.image_label.pack()
 
         self.update_button_colors()
+        self.update_counter_label()
 
     def label_image(self, class_name):
         current_image = self.image_files[self.current_index]
@@ -108,6 +121,7 @@ class ImageClassifierGUI:
             self.save_results()
             messagebox.showinfo("Info", "Image labeling complete.")
             self.root.destroy()
+        self.update_counter_label()
 
     def previous_image(self):
         self.current_index -= 1
@@ -122,6 +136,7 @@ class ImageClassifierGUI:
                 self.selected_image_label.config(text=current_class)
             else:
                 self.selected_image_label.config(text="")
+        self.update_counter_label()
 
     def update_button_colors(self):
         for button in self.class_buttons:
