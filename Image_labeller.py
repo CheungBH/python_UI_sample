@@ -148,7 +148,9 @@ class ImageLabellerGUI:
         else:
             self.save_results()
             messagebox.showinfo("Info", "Image labeling complete.")
-            self.root.destroy()
+            self.current_index -= 1
+
+            # self.root.destroy()
         self.update_counter_label()
 
     def previous_image(self):
