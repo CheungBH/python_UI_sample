@@ -62,6 +62,9 @@ class ImageClassifierGUI:
         # Update the counter label
         self.update_counter_label()
 
+        self.finish_button = tk.Button(self.root, text="Finish", command=self.show_warning)
+        self.finish_button.pack(side=tk.TOP, pady=10)
+
     def update_counter_label(self):
         total_images = len(self.image_files)
         current_image_number = self.current_index + 1
@@ -123,6 +126,12 @@ class ImageClassifierGUI:
         else:
             self.selected_image_label.config(text="")
 
+    def finish_classification(self):
+        self.save_results()
+        messagebox.showinfo("Info", "Image labeling complete.")
+        self.root.destroy()
+
+
     def label_image(self, class_name):
         current_image = self.image_files[self.current_index]
         self.classification_results[current_image] = class_name
@@ -170,6 +179,11 @@ class ImageClassifierGUI:
                     button.configure(bg="green")
         else:
             self.selected_image_label.config(text="")
+
+    def show_warning(self):
+        result = messagebox.askyesno("Warning", "Are you sure you want to finish labeling?")
+        if result == tk.YES:
+            self.finish_classification()
 
     def save_results(self):
         # Save the classification results to a text file
