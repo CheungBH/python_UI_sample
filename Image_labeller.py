@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 
 folder_path = "UI_images/cat_dog"  # Specify the folder path directly
 classes_list = ["cat", "dog"]  # Add your desired classes here
-
+target_file = "classification_results.txt"  # Specify the target file name directly
 
 class ImageClassifierGUI:
     def __init__(self, root):
@@ -44,7 +44,7 @@ class ImageClassifierGUI:
         self.text_view_frame = tk.Frame(self.root)
         self.text_view_frame.pack(pady=10)
 
-        self.text_view_label = tk.Label(self.text_view_frame, text="Selected Image:")
+        self.text_view_label = tk.Label(self.text_view_frame, text="Label:")
         self.text_view_label.pack(side=tk.LEFT)
 
         self.selected_image_label = tk.Label(self.text_view_frame, text="")
@@ -55,8 +55,7 @@ class ImageClassifierGUI:
         self.buttons_frame_bottom.pack(pady=10)
 
     def load_images(self):
-        self.image_files = [file for file in os.listdir(folder_path) if
-                            file.lower().endswith(('.png', '.jpg', '.jpeg'))]
+        self.image_files = [file for file in os.listdir(folder_path) if file.lower().endswith(('.png', '.jpg', '.jpeg'))]
         if len(self.image_files) == 0:
             messagebox.showerror("Error", "No image files found in the selected folder.")
             return
@@ -64,8 +63,7 @@ class ImageClassifierGUI:
 
         self.class_buttons = []
         for i, class_name in enumerate(self.classes):
-            button = tk.Button(self.buttons_frame_bottom, text=class_name,
-                               command=lambda x=class_name: self.label_image(x))
+            button = tk.Button(self.buttons_frame_bottom, text=class_name, command=lambda x=class_name: self.label_image(x))
             button.grid(row=0, column=i, padx=5)
             self.class_buttons.append(button)
 
@@ -97,6 +95,7 @@ class ImageClassifierGUI:
         current_image = self.image_files[self.current_index]
         self.classification_results[current_image] = class_name
         self.selected_image_label.config(text=class_name)
+        self.update_button_colors()
         self.next_image()
 
     def next_image(self):
@@ -131,7 +130,7 @@ class ImageClassifierGUI:
         current_image = self.image_files[self.current_index]
         if current_image in self.classification_results:
             class_name = self.classification_results[current_image]
-            self.selected_image_label.config(text=class_name)
+            self.selected_image_label.config(text=class_name, fg="red")  # Change text color to green
             for button in self.class_buttons:
                 if button["text"] == class_name:
                     button.configure(bg="green")
@@ -140,7 +139,7 @@ class ImageClassifierGUI:
 
     def save_results(self):
         # Save the classification results to a text file
-        with open("classification_results.txt", "w") as file:
+        with open(target_file, "w") as file:
             for image_file, class_label in self.classification_results.items():
                 file.write(f"{image_file}: {class_label}\n")
 
