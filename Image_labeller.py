@@ -6,6 +6,7 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 
 folder_path = "UI_images/cat_dog"  # Specify the folder path directly
+classes_list = ["cat", "dog", "pig", "cxk"]  # Add your desired classes here
 
 class ImageClassifierGUI:
     def __init__(self, root):
@@ -20,36 +21,38 @@ class ImageClassifierGUI:
     def create_widgets(self):
         self.root.title("Image Classifier")
 
+        # Create buttons frame at the top
+        self.buttons_frame_top = tk.Frame(self.root)
+        self.buttons_frame_top.pack(side=tk.TOP, pady=10)
+
+        # Create back button
+        self.back_button = tk.Button(self.buttons_frame_top, text="Back", command=self.previous_image)
+        self.back_button.pack(side=tk.LEFT, padx=5)
+        self.back_button.config(state=tk.DISABLED)
+
+        # Create next button
+        self.next_button = tk.Button(self.buttons_frame_top, text="Next", command=self.next_image)
+        self.next_button.pack(side=tk.RIGHT, padx=5)
+
         # Create a frame to display the image
         self.image_frame = tk.Frame(self.root)
         self.image_frame.pack(pady=10)
 
-        # Create buttons frame
-        self.buttons_frame = tk.Frame(self.root)
-        self.buttons_frame.pack(pady=10)
-
-        # Create next button
-        self.next_button = tk.Button(self.buttons_frame, text="Next", command=self.next_image)
-        self.next_button.grid(row=0, column=0, padx=5)
-
-        # Create back button
-        self.back_button = tk.Button(self.buttons_frame, text="Back", command=self.previous_image)
-        self.back_button.grid(row=0, column=1, padx=5)
-        self.back_button.config(state=tk.DISABLED)
+        # Create buttons frame at the bottom
+        self.buttons_frame_bottom = tk.Frame(self.root)
+        self.buttons_frame_bottom.pack(pady=10)
 
     def load_images(self):
-        folder_path = "UI_images/cat_dog"  # Specify the folder path directly
         self.image_files = [file for file in os.listdir(folder_path) if file.lower().endswith(('.png', '.jpg', '.jpeg'))]
         if len(self.image_files) == 0:
             messagebox.showerror("Error", "No image files found in the selected folder.")
             return
-        self.classes = ["cat", "dog"]  # Add your desired classes here
+        self.classes = classes_list  # Add your desired classes here
 
-        # Create class buttons
         self.class_buttons = []
         for i, class_name in enumerate(self.classes):
-            button = tk.Button(self.buttons_frame, text=class_name, command=lambda x=class_name: self.label_image(x))
-            button.grid(row=0, column=i+2, padx=5)
+            button = tk.Button(self.buttons_frame_bottom, text=class_name, command=lambda x=class_name: self.label_image(x))
+            button.grid(row=0, column=i, padx=5)
             self.class_buttons.append(button)
 
         self.display_image()
@@ -67,16 +70,13 @@ class ImageClassifierGUI:
             scale = min(max_height / image_height, max_width / image_width)
             image = cv2.resize(image, None, fx=scale, fy=scale)
 
-        # Convert the image to Tkinter format and display it
         self.photo = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
         self.photo = Image.fromarray(self.photo)
         self.photo = ImageTk.PhotoImage(self.photo)
 
-        # Create a label widget to display the image
         self.image_label = tk.Label(self.image_frame, image=self.photo)
         self.image_label.pack()
 
-        # Update button colors
         self.update_button_colors()
 
     def label_image(self, class_name):
@@ -119,14 +119,10 @@ class ImageClassifierGUI:
         results_file.close()
 
 
-# Create the root window
 root = tk.Tk()
 
-# Create the ImageClassifierGUI instance
 classifier_gui = ImageClassifierGUI(root)
 
-# Load images when the application starts
 classifier_gui.load_images()
 
-# Run the Tkinter event loop
 root.mainloop()
